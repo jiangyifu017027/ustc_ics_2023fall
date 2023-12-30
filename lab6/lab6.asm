@@ -80,6 +80,7 @@ FACT_N  .FILL xFFFF
         ST R5, SAVE_R5
         ST R6, SAVE_R6
         ST R7, SAVE_R7
+        
         LD R6,STACK;压栈
 
         LD R0, NEWLINE
@@ -87,6 +88,9 @@ FACT_N  .FILL xFFFF
         GETC ;读取键盘结果
         OUT
         ST R0, NUM
+        LD R1, ANSWER
+        STR R0, R1, #0
+        
         ADD R5, R0, #0
         LD  R3, ASCII_0
         ADD R0, R0, R3    ;n-'0'
@@ -101,6 +105,8 @@ FACT_N  .FILL xFFFF
         
         LD R0, NEWLINE
         OUT
+        
+        LD R0, NUM
         
         LD  R3, ASCII_7
         ADD R0, R0, R3
@@ -131,6 +137,7 @@ MAIN    ADD R6,R6,#-1
         OUT
         LEA R0, OUTPUT_4
         PUTS
+        
         LD R0, OFF
         LD R2, NETH
         
@@ -163,7 +170,7 @@ RECHAN_3   OUT
            LD R0, OFF
            ADD R0, R0, R1
            OUT
-
+           
         LD R0, SAVE_R0
         LD R1, SAVE_R1
         LD R2, SAVE_R2
@@ -221,6 +228,7 @@ NEGH  .FILL	xFF9C
 POSH  .FILL	x0064
 POTH  .FILL x03E8
 NEGS  .FILL xFFF6
+ANSWER .FILL x3FFF
 NUM   .BLKW 1
 SAVE_R0 .BLKW 1
 SAVE_R1 .BLKW 1

@@ -215,13 +215,15 @@ std::vector<std::string> assemble(const std::vector<std::string> &input_lines) {
                     std::string FILL = tokens[2];
                     std::string subFILL = FILL.substr(1, 1);
                     std::string number = FILL.substr(1);
+
+                    symbolTable[tokens[0]] = address;
                     
-                    if (subFILL == "x") {
-                        symbolTable[tokens[0]] = std::stoi(number, nullptr, 16);
-                    }
-                    else if (subFILL == "#") {
-                        symbolTable[tokens[0]] = std::stoi(number, nullptr, 10);
-                    }
+                    // if (subFILL == "x") {
+                    //     symbolTable[tokens[0]] = std::stoi(number, nullptr, 16);
+                    // }
+                    // else if (subFILL == "#") {
+                    //     symbolTable[tokens[0]] = std::stoi(number, nullptr, 10);
+                    // }
                 }
                 else if (tokens[1] == ".BLKW") {
                     symbolTable[tokens[0]] = address;
@@ -748,7 +750,11 @@ std::string LD_handle(const std::vector<std::string> &tokens, int &address, std:
 
     std::string Label = tokens[2];
     int PCoffset_9 = symbolTable[Label] - address - 1;
+    // std::cout << std::hex << symbolTable[Label] << std::endl;
+    // std::cout << std::hex << address << std::endl;
+    // std::cout << PCoffset_9 << std::endl;
     std::string strPCoffset_9 = decimalToBinary_PCoffset9(PCoffset_9);
+    // std::cout << strPCoffset_9 << std::endl;
     machine_code += strPCoffset_9;
 
     return machine_code;

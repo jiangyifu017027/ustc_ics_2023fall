@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/ics_2023fall/lab4",
-      "program": "c:/ics_2023fall/lab4/build/Debug/outDebug",
+      "cwd": "c:/ics_2023fall/lab7",
+      "program": "c:/ics_2023fall/lab7/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

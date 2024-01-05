@@ -9,7 +9,11 @@
 std::vector<std::string> read_asm_file(const std::string &filename);
 void write_output_file(const std::string &filename, const std::vector<std::string> &output);
 std::vector<std::string> assemble(const std::vector<std::string> &input_lines);
-std::string translate_instruction(const std::string &instruction);
+std::string translate_instruction(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable);
+std::string ADD_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable);
+std::string AND_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable);
+std::string BR_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable);
+
 
 // TODO: Define any additional functions you need to implement the assembler, e.g. the symbol table.
 
@@ -73,7 +77,7 @@ void write_output_file(const std::string &filename, const std::vector<std::strin
     }
 }
 
-const std::unordered_set<std::string> instruction = {
+std::unordered_set<std::string> instruction = {
     "ADD",
     "AND",
     "BR",
@@ -99,7 +103,7 @@ const std::unordered_set<std::string> instruction = {
     "TRAP"
 };
 
-const std::unordered_set<std::string> pseudo_op = {
+std::unordered_set<std::string> pseudo_op = {
     ".FILL",
     ".STRINGZ",
     ".BLKW",
@@ -163,9 +167,28 @@ std::vector<std::string> assemble(const std::vector<std::string> &input_lines) {
             // 更新symbol table
             address += 1;
             
-            std::string newToken = tokens[0];
-            if (instruction.count(newToken) <= 0 && pseudo_op.count(newToken) <= 0) {
-                symbolTable[newToken] = address;
+            if (instruction.count(tokens[0]) <= 0 && pseudo_op.count(tokens[1]) <= 0) {
+                symbolTable[tokens[0]] = address;
+            }
+            else if (pseudo_op.count(tokens[1]) >= 1) {
+                if (tokens[1] == ".FILL") {
+                    std::string FILL = tokens[2];
+                    std::string subFILL = FILL.substr(1, 1);
+                    std::string number = FILL.substr(1);
+                    
+                    if (subFILL == "x") {
+                        symbolTable[tokens[0]] = std::stoi(number, nullptr, 16);
+                    }
+                    else if (subFILL == "#") {
+                        symbolTable[tokens[0]] = std::stoi(number, nullptr, 10);
+                    }
+                }
+                else if (tokens[1] == ".BLKW") {
+
+                }
+                else if (tokens[1] == ".STRINGZ") {
+
+                }
             }
 
         }
@@ -195,9 +218,19 @@ std::vector<std::string> assemble(const std::vector<std::string> &input_lines) {
 
             if (instruction.count(tokens[0]) > 0) {
                 std::string machine_code = translate_instruction(tokens, address, symbolTable);
+                output_lines.push_back(machine_code);
             }
             else {
+                if (instruction.count(tokens[1]) > 0) {
+                    tokens.erase(tokens.begin());
+                    std::string machine_code = translate_instruction(tokens, address, symbolTable);
+                    output_lines.push_back(machine_code);
+                }
+                else {
+                    // 考虑pseudo_op情况
+                    tokens.erase(tokens.begin());
 
+                }
             }
 
         }
@@ -207,7 +240,7 @@ std::vector<std::string> assemble(const std::vector<std::string> &input_lines) {
     return output_lines;
 } 
 
-const std::unordered_map<std::string, std::string> register = {
+std::unordered_map<std::string, std::string> Register = {
     {"R0", "000"},
     {"R1", "001"},
     {"R2", "010"},
@@ -218,7 +251,7 @@ const std::unordered_map<std::string, std::string> register = {
     {"R7", "111"}
 };
 
-std::string translate_instruction(const std::vector<std::string> &tokens, int &address, const std::unordered_map<std::string, int> &symbolTable) {
+std::string translate_instruction(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable) {
     std::string machine_code;
 
     // TODO: Implement the translation of an individual instruction
@@ -226,102 +259,201 @@ std::string translate_instruction(const std::vector<std::string> &tokens, int &a
     if (tokens[0] == "ADD") {
         machine_code = ADD_handle(tokens, address, symbolTable);
     }
-    else if (tokens[0] == "AND") {
+    if (tokens[0] == "AND") {
+        machine_code = AND_handle(tokens, address, symbolTable);
+    }
+    if (tokens[0] == "BR") {
+        machine_code = BR_handle(tokens, address, symbolTable);
+    }
+    if (tokens[0] == "BRN") {
 
     }
-    else if (tokens[0] == "BR") {
+    if (tokens[0] == "BRZ") {
 
     }
-    else if (tokens[0] == "BRN") {
+    if (tokens[0] == "BRP") {
 
     }
-    else if (tokens[0] == "BRZ") {
+    if (tokens[0] == "BRNZ") {
 
     }
-    else if (tokens[0] == "BRP") {
+    if (tokens[0] == "BRNP") {
 
     }
-    else if (tokens[0] == "BRNZ") {
+    if (tokens[0] == "BRZP") {
 
     }
-    else if (tokens[0] == "BRNP") {
+    if (tokens[0] == "BRNZP") {
 
     }
-    else if (tokens[0] == "BRZP") {
+    if (tokens[0] == "JMP") {
 
     }
-    else if (tokens[0] == "BRNZP") {
+    if (tokens[0] == "JSR") {
 
     }
-    else if (tokens[0] == "JMP") {
+    if (tokens[0] == "JSRR") {
 
     }
-    else if (tokens[0] == "JSR") {
+    if (tokens[0] == "LD") {
 
     }
-    else if (tokens[0] == "JSRR") {
+    if (tokens[0] == "LDI") {
 
     }
-    else if (tokens[0] == "LD") {
+    if (tokens[0] == "LDR") {
 
     }
-    else if (tokens[0] == "LDI") {
+    if (tokens[0] == "LEA") {
 
     }
-    else if (tokens[0] == "LDR") {
+    if (tokens[0] == "NOT") {
 
     }
-    else if (tokens[0] == "LEA") {
+    if (tokens[0] == "RET") {
 
     }
-    else if (tokens[0] == "NOT") {
+    if (tokens[0] == "RTI") {
 
     }
-    else if (tokens[0] == "RET") {
+    if (tokens[0] == "ST") {
 
     }
-    else if (tokens[0] == "RTI") {
+    if (tokens[0] == "STI") {
 
     }
-    else if (tokens[0] == "ST") {
+    if (tokens[0] == "STR") {
 
     }
-    else if (tokens[0] == "STI") {
-
-    }
-    else if (tokens[0] == "STR") {
-
-    }
-    else if (tokens[0] == "TRAP") {
+    if (tokens[0] == "TRAP") {
 
     }
 
     return machine_code;
 }
 
-std::string ADD_handle(const std::vector<std::string> &tokens, int &address, const std::unordered_map<std::string, int> &symbolTable) {
+std::string decimalToBinary_imm(int decimal) {
+    // 处理负数的情况
+    if (decimal < 0) {
+        // 将负数转换为补码
+        decimal = -decimal;
+        decimal = (~decimal) + 1;
+    }
+
+    // 将十进制数转换为二进制字符串
+    std::string binary = std::bitset<32>(decimal).to_string();
+
+    // 截取后5位二进制数
+    std::string result = binary.substr(27, 5);
+
+    return result;
+}
+
+std::string ADD_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable) {
     std::string machine_code;
 
     machine_code += "0001";
 
     for (size_t i = 1; i < tokens.size(); ++i) {
-        switch (i):
+        switch (i) {
             case 1:
-                machine_code += register[tokens[i]];
+                machine_code += Register[tokens[i]];
                 break;
             case 2:
-                machine_code += register[tokens[i]];
+                machine_code += Register[tokens[i]];
                 break;
             case 3:
-                if (register.count(tokens[i]) != 0) {
+                if (Register.count(tokens[i]) != 0) {
                     machine_code += "000";
-                    machine_code += register[tokens[i]];
+                    machine_code += Register[tokens[i]];
                 }
                 else {
                     machine_code += "1";
                     std::string str = tokens[i].substr(0, 1);
                     std::string number = tokens[i].substr(1);
-                    
+                    int decimal = 0;
+                    if (str == "x") {
+                        decimal = std::stoi(number, nullptr, 16);
+                    }
+                    else if (str == "#") {
+                        decimal = std::stoi(number, nullptr, 10);
+                    }
+                    std::string imm = decimalToBinary_imm(decimal);
+                    machine_code += imm;
                 }
+        }
     }
+
+    return machine_code;
+}
+
+// AND的实现逻辑和ADD基本一致
+std::string AND_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable) {
+    std::string machine_code;
+
+    machine_code += "0101";
+
+    for (size_t i = 1; i < tokens.size(); ++i) {
+        switch (i) {
+            case 1:
+                machine_code += Register[tokens[i]];
+                break;
+            case 2:
+                machine_code += Register[tokens[i]];
+                break;
+            case 3:
+                if (Register.count(tokens[i]) != 0) {
+                    machine_code += "000";
+                    machine_code += Register[tokens[i]];
+                }
+                else {
+                    machine_code += "1";
+                    std::string str = tokens[i].substr(0, 1);
+                    std::string number = tokens[i].substr(1);
+                    int decimal = 0;
+                    if (str == "x") {
+                        decimal = std::stoi(number, nullptr, 16);
+                    }
+                    else if (str == "#") {
+                        decimal = std::stoi(number, nullptr, 10);
+                    }
+                    std::string imm = decimalToBinary_imm(decimal);
+                    machine_code += imm;
+                }
+        }
+    }
+
+    return machine_code;
+}
+
+std::string decimalToBinary_PCoffset9(int decimal) {
+    // 处理负数的情况
+    if (decimal < 0) {
+        // 将负数转换为补码
+        decimal = -decimal;
+        decimal = (~decimal) + 1;
+    }
+
+    // 将十进制数转换为二进制字符串
+    std::string binary = std::bitset<32>(decimal).to_string();
+
+    // 截取后9位二进制数
+    std::string result = binary.substr(23, 9);
+
+    return result;
+}
+
+std::string BR_handle(const std::vector<std::string> &tokens, int &address, std::unordered_map<std::string, int> &symbolTable) {
+    std::string machine_code;
+
+    machine_code += "0000";
+    machine_code += "111";
+
+    std::string Label = tokens[1];
+    int PCoffset_9 = symbolTable[Label] - address - 1;
+
+    std::string strPCoffset_9 = decimalToBinary_PCoffset9(PCoffset_9);
+    machine_code += strPCoffset_9;
+
+    return machine_code;
 }

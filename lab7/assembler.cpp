@@ -304,7 +304,7 @@ std::vector<std::string> assemble(const std::vector<std::string> &input_lines) {
                             std::string result = decimalToBinary(decimal);
                             output_lines.push_back(result);
                         }
-                        else if (tokens[0] == "#") {
+                        else if (subLabel == "#") {
                             int decimal = std::stoi(number, nullptr, 10);
                             std::string result = decimalToBinary(decimal);
                             output_lines.push_back(result);

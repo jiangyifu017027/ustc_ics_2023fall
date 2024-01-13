@@ -3,7 +3,7 @@
 #include <fstream>
 #include <bitset>
 
-#define LENGTH 1
+#define LENGTH 3
 #define MAXLEN 100
 #define STUDENT_ID_LAST_DIGIT 3
 

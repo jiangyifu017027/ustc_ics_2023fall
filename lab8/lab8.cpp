@@ -11,35 +11,137 @@
 
 int16_t lab1(int16_t n) {
     // initialize
+    int result = 0; //记录0的个数
 
     // calculation
+    if ((n & 1) == 0) {
+        n = ~n;
+        n = n + 1;
+    }
+
+    int k = 16;
+    int16_t m = 1;
+
+    while (k > 0) {
+        k--;
+        int16_t temp = n & m;
+        if (temp == 0) {
+            result++;
+        }
+        m = m + m;
+    }
+
+    result = result + 6; // 加ID尾号 PB21020706
 
     // return value
+    return result;
+}
+
+int16_t binTodecimal(int16_t v_n) {
+    int16_t sub_f = -1000;
+    int16_t sub_s = -100;
+    int16_t sub_t = -10;
+
+    while(v_n >= 0) {
+        v_n = v_n - sub_f;
+    }
+    v_n = v_n + 1000;
+
+    while(v_n >= 0) {
+        v_n = v_n - sub_s;
+    }
+    v_n = v_n + 100;
+    
+    while(v_n >= 0) {
+        v_n = v_n - sub_t;
+    }
+    v_n = v_n + 10;
+
+    return v_n;
 }
 
 int16_t lab2(int16_t n) {
-    // initialize
+    // 从内存中读取N的数值
+    int16_t v_n = 3;  // v_n的初始值为3
+    int16_t d_n = 1;   // d_n的初始值为1
 
-    // calculation
+    // 初始化辅助变量
+    int16_t mod = 4095;
 
-    // return value
+    // 循环
+    while (n > 1) {
+        // 计算下一项的值 v_(n+1)
+        v_n = (v_n + d_n + v_n + d_n) & mod;
+
+        // 检查 v_(n+1) 是否可以被 8 整除或个位数是否为 8
+        if (v_n & 7 == 0 || binTodecimal(v_n) == 8) {
+            d_n = -d_n;
+        }
+        n--;
+    }
+    return v_n;
 }
 
 int16_t lab3(char s1[], char s2[]) {
-    // initialize
-
-    // calculation
-
-    // return value
+    int i = 0;
+    while (s1[i] != '\0' && s2[i] != '\0') {
+        if (s1[i] != s2[i]) {
+            return s1[i] - s2[i];
+        }
+        i++;
+    }
+    return s1[i - 1] - s2[i - 1];
 }
+
+
 
 
 int16_t lab4(int16_t *memory, int16_t n) {
     // initialize
+    int16_t R2 = 0;
+    int16_t num = 1;
+    int16_t m = n;
 
-    // calculation
+    while (m > 0) {
+        R2 = R2 + num;
+        num = num + num;
+        m--;
+    }
 
-    // return value
+    int16_t R7 = R2;
+
+    R2 = ~R2;
+    R2 = R2 + 1;
+
+    int16_t k = 0;
+    int16_t result = 0;
+
+    if (n & 1 == 0) {
+        int16_t m = n;
+        int16_t temp = 2;
+        while (m > 0) {
+            result += temp;
+            temp = temp + temp;
+            temp = temp + temp;
+            m = m - 2;
+        }
+    }
+    else {
+        int16_t m = n;
+        int16_t temp = 1;
+        while (m > 0) {
+            result += temp;
+            temp = temp + temp;
+            temp = temp + temp;
+            m = m - 2;
+        }
+    }
+
+    // for (int i = 1; i <= result; i = i + 1) {
+    //     memory[result - i] = 
+    // }
+
+    return result;
 }
 
 int main() {
@@ -70,16 +172,16 @@ int main() {
     }
     
     // lab4
-    std::cout << "===== lab4 =====" << std::endl;
-    int16_t memory[MAXLEN], move;
-    for (int i = 0; i < LENGTH; ++i) {
-        file >> n;
-        int16_t state = 0;
-        move = lab4(memory, n);
-        for(int j = 0; j < move; ++j){
-            std::cout << std::bitset<16>(memory[j]) << std::endl;
-        }
-    }
+    // std::cout << "===== lab4 =====" << std::endl;
+    // int16_t memory[MAXLEN], move;
+    // for (int i = 0; i < LENGTH; ++i) {
+    //     file >> n;
+    //     int16_t state = 0;
+    //     move = lab4(memory, n);
+    //     for(int j = 0; j < move; ++j){
+    //         std::cout << std::bitset<16>(memory[j]) << std::endl;
+    //     }
+    // }
     
     file.close();
     return 0;

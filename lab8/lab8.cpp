@@ -43,17 +43,17 @@ int16_t binTodecimal(int16_t v_n) {
     int16_t sub_t = -10;
 
     while(v_n >= 0) {
-        v_n = v_n - sub_f;
+        v_n = v_n + sub_f;
     }
     v_n = v_n + 1000;
 
     while(v_n >= 0) {
-        v_n = v_n - sub_s;
+        v_n = v_n + sub_s;
     }
     v_n = v_n + 100;
     
     while(v_n >= 0) {
-        v_n = v_n - sub_t;
+        v_n = v_n + sub_t;
     }
     v_n = v_n + 10;
 
@@ -74,11 +74,12 @@ int16_t lab2(int16_t n) {
         v_n = (v_n + d_n + v_n + d_n) & mod;
 
         // 检查 v_(n+1) 是否可以被 8 整除或个位数是否为 8
-        if (v_n & 7 == 0 || binTodecimal(v_n) == 8) {
+        if ((v_n & 7) == 0 || binTodecimal(v_n) == 8) {
             d_n = -d_n;
         }
         n--;
     }
+
     return v_n;
 }
 
@@ -90,11 +91,25 @@ int16_t lab3(char s1[], char s2[]) {
         }
         i++;
     }
-    return s1[i - 1] - s2[i - 1];
+    return s1[i] - s2[i];
 }
 
+int16_t gray(int16_t result) {
+    int16_t temp = 1;
+    while ((temp & result) == 0) {
+        temp = temp + temp;
+    }
 
+    int16_t change = temp + temp;
+    if ((result & change) > 0) {
+        result = result - change;
+    }
+    else {
+        result = result + change;
+    }
 
+    return result;
+}
 
 int16_t lab4(int16_t *memory, int16_t n) {
     // initialize
@@ -114,13 +129,13 @@ int16_t lab4(int16_t *memory, int16_t n) {
     R2 = R2 + 1;
 
     int16_t k = 0;
-    int16_t result = 0;
+    int16_t step = 0; // step是完成步数
 
-    if (n & 1 == 0) {
+    if ((n & 1) == 0) {
         int16_t m = n;
         int16_t temp = 2;
         while (m > 0) {
-            result += temp;
+            step = step + temp;
             temp = temp + temp;
             temp = temp + temp;
             m = m - 2;
@@ -130,18 +145,37 @@ int16_t lab4(int16_t *memory, int16_t n) {
         int16_t m = n;
         int16_t temp = 1;
         while (m > 0) {
-            result += temp;
+            step = step + temp;
             temp = temp + temp;
             temp = temp + temp;
             m = m - 2;
         }
     }
 
-    // for (int i = 1; i <= result; i = i + 1) {
-    //     memory[result - i] = 
-    // }
+    int odd_point = 1;
+    int16_t result = 0;
 
-    return result;
+    for (int i = step - 1; i >= 0 ; --i) {
+        int16_t val = ~result;
+        val = val & R7;
+        memory[i] = val;
+
+        if (odd_point == 1) {
+            odd_point = odd_point + 1;
+            if ((result & 1) == 0) {
+                result = result + 1;
+            }
+            else {
+                result = result - 1;
+            }
+        }
+        else {
+            odd_point = odd_point - 1;
+            result = gray(result);
+        }
+    }
+
+    return step;
 }
 
 int main() {
@@ -172,16 +206,16 @@ int main() {
     }
     
     // lab4
-    // std::cout << "===== lab4 =====" << std::endl;
-    // int16_t memory[MAXLEN], move;
-    // for (int i = 0; i < LENGTH; ++i) {
-    //     file >> n;
-    //     int16_t state = 0;
-    //     move = lab4(memory, n);
-    //     for(int j = 0; j < move; ++j){
-    //         std::cout << std::bitset<16>(memory[j]) << std::endl;
-    //     }
-    // }
+    std::cout << "===== lab4 =====" << std::endl;
+    int16_t memory[MAXLEN], move;
+    for (int i = 0; i < LENGTH; ++i) {
+        file >> n;
+        int16_t state = 0;
+        move = lab4(memory, n);
+        for(int j = 0; j < move; ++j){
+            std::cout << std::bitset<16>(memory[j]) << std::endl;
+        }
+    }
     
     file.close();
     return 0;
